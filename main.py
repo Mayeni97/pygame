@@ -6,6 +6,25 @@ pygame.init()
 Screen = pygame.display.set_mode((800, 600))
 clock = pygame.time.Clock()
 
+class Apple:
+    def __init__(self, image, position, speed):
+        self.image = image
+        self.rect = self.image.get_rect(topleft=(position))
+        self.speed = speed 
+        
+    def move (self):
+        self.rect.y += self.speed
+        
+               
+    def draw(self):
+        Screen.blit(self.image, self.rect.topleft)
+        
+    def update(self):
+        self.rect.y += 5
+        if self.rect.y > Screen.get_height():
+            self.rect.y = 0
+            self.rect.x = random.randint(0, Screen.get_width() - self.rect.width)
+
 # Tile Size
 TILESIZE = 50
 
@@ -23,7 +42,12 @@ player_rect = player_image.get_rect(center=(Screen.get_width() / 2, Screen.get_h
 # apple
 apple_image = pygame.image.load("assets/apple.png").convert_alpha()
 apple_image = pygame.transform.scale(apple_image, (TILESIZE, TILESIZE))
-apple  
+
+
+apples = [
+    Apple(apple_image, (100, 100), 5),
+    Apple(apple_image, (200, 200), 5),
+]
 running = True 
 
 def update ():
@@ -32,11 +56,19 @@ def update ():
         player_rect.x -= 5
     if keys[pygame.K_RIGHT]:
         player_rect.x += 5
+        
+#apple movement
+    for apple in apples:
+        apple.move()
 
 def draw():
     Screen.fill("skyblue")
     Screen.blit(floor_image, floor_rect)
     Screen.blit(player_image, player_rect.topleft)
+    
+    for apple in apples:
+        Screen.blit(apple.image, apple.rect)
+        
     
 # Game loop
 while running:
