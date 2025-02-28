@@ -1,5 +1,6 @@
 import pygame
 import sys
+import random
 
 pygame.init()
 # Set up the display
@@ -25,6 +26,9 @@ class Apple:
             self.rect.y = 0
             self.rect.x = random.randint(0, Screen.get_width() - self.rect.width)
 
+speed = 3
+score = 0
+
 # Tile Size
 TILESIZE = 50
 
@@ -48,9 +52,15 @@ apples = [
     Apple(apple_image, (100, 100), 5),
     Apple(apple_image, (200, 200), 5),
 ]
+
+font = pygame.font.Font("assets/PixeloidMono.ttf", TILESIZE // 2)
+
 running = True 
 
 def update ():
+    global speed
+    global score
+    
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
         player_rect.x -= 5
@@ -60,7 +70,16 @@ def update ():
 #apple movement
     for apple in apples:
         apple.move()
-
+        if apple.rect.colliderect(floor_rect):
+            apples.remove(apple)
+            apples.append(Apple(apple_image, (random.randint(0, Screen.get_width()), 0), speed))
+        elif apple.rect.colliderect(player_rect):
+            apples.remove(apple)
+            apples.append(Apple(apple_image, (random.randint(0, Screen.get_width()), 0), speed))
+            speed += 1
+            score += 1
+            
+            
 def draw():
     Screen.fill("skyblue")
     Screen.blit(floor_image, floor_rect)
@@ -68,6 +87,9 @@ def draw():
     
     for apple in apples:
         Screen.blit(apple.image, apple.rect)
+        
+    score_text = font.render(f"Score: {score}", True, "black")
+    Screen.blit(score_text, (10, 10))
         
     
 # Game loop
@@ -78,7 +100,8 @@ while running:
             sys.exit()
             
     update()        
-    draw()        
+    draw() 
+           
             
     clock.tick(60)
     pygame.display.update()
